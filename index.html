@@ -1,74 +1,4 @@
-"""
-Medical Insurance Cost Estimation - Web App
-Run: python webapp.py
-Open: http://localhost:5000
-"""
-
-from http.server import HTTPServer, SimpleHTTPRequestHandler
-import json
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-import os
-
-# ─── Train the model ──────────────────────────────────────────────
-
-print("Training model...")
-
-csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "insurance.csv")
-df = pd.read_csv(csv_path, encoding='latin1')
-
-charges_mean = df['charges'].mean()
-charges_std = df['charges'].std()
-age_mean = df['age'].mean()
-age_std = df['age'].std()
-bmi_mean = df['bmi'].mean()
-bmi_std = df['bmi'].std()
-
-categorical_columns = df.select_dtypes(include=['object', 'str']).columns.tolist()
-encoder = OneHotEncoder(sparse_output=False)
-one_hot_encoded = encoder.fit_transform(df[categorical_columns])
-one_hot_df = pd.DataFrame(one_hot_encoded, columns=encoder.get_feature_names_out(categorical_columns))
-df_encoded = pd.concat([df.reset_index(drop=True), one_hot_df.reset_index(drop=True)], axis=1)
-df_encoded = df_encoded.drop(categorical_columns, axis=1)
-
-scaler = StandardScaler()
-df_encoded[['age', 'bmi', 'charges']] = scaler.fit_transform(df_encoded[['age', 'bmi', 'charges']])
-
-X = df_encoded.drop(columns=['charges'])
-y = df_encoded['charges']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-model = LinearRegression()
-model.fit(X_train, y_train)
-
-print("Model ready!")
-
-dataset_stats = {
-    "total_records": len(df),
-    "avg_charges": float(df['charges'].mean()),
-    "avg_age": float(df['age'].mean()),
-    "avg_bmi": float(df['bmi'].mean()),
-}
-
-
-def predict(age, sex, bmi, children, smoker, region):
-    age_scaled = (age - age_mean) / age_std
-    bmi_scaled = (bmi - bmi_mean) / bmi_std
-    cat_input = pd.DataFrame([[sex, smoker, region]], columns=categorical_columns)
-    cat_encoded = encoder.transform(cat_input)
-    features = np.concatenate([[age_scaled, bmi_scaled, children], cat_encoded[0]])
-    feature_names = ['age', 'bmi', 'children'] + list(encoder.get_feature_names_out(categorical_columns))
-    input_df = pd.DataFrame([features], columns=feature_names)
-    prediction_scaled = model.predict(input_df)[0]
-    return prediction_scaled * charges_std + charges_mean
-
-
-# ─── HTML ──────────────────────────────────────────────────────────
-
-HTML_PAGE = '''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -521,8 +451,8 @@ HTML_PAGE = '''<!DOCTYPE html>
         </div>
 
         <div class="pills">
-            <span class="pill"><strong id="s-rec">--</strong> records trained</span>
-            <span class="pill"><strong id="s-avg">--</strong> avg. cost</span>
+            <span class="pill"><strong>1,338</strong> records trained</span>
+            <span class="pill"><strong>$13,270</strong> avg. cost</span>
             <span class="pill"><strong>80.7%</strong> model accuracy</span>
         </div>
 
@@ -610,103 +540,112 @@ HTML_PAGE = '''<!DOCTYPE html>
     </div>
 
     <script>
-    fetch('/api/stats').then(r=>r.json()).then(d=>{
-        document.getElementById('s-rec').textContent=d.total_records.toLocaleString();
-        document.getElementById('s-avg').textContent='$'+Math.round(d.avg_charges).toLocaleString();
-    });
+    // Machine Learning Model Weights extracted from Python Scikit-Learn
+    const model = {
+        intercept: 0.5397583863641171,
+        coefficients: [
+            0.298003156707633,      // age
+            0.17080620644423997,    // bmi
+            0.039279760051668,      // children
+            0.005423754589766558,   // sex_female
+            -0.005423754589766678,  // sex_male
+            -0.9850301161026559,    // smoker_no
+            0.9850301161026562,     // smoker_yes
+            0.048491178685808246,   // region_northeast
+            0.019333825623357632,   // region_northwest
+            -0.03700907607286624,   // region_southeast
+            -0.03081592823629951    // region_southwest
+        ],
+        charges_mean: 13270.422265141257,
+        charges_std: 12110.011236694001,
+        age_mean: 39.20702541106129,
+        age_std: 14.049960379216154,
+        bmi_mean: 30.66339686098655,
+        bmi_std: 6.098186911679014
+    };
 
-    document.getElementById('frm').addEventListener('submit',async e=>{
+    function predict(age, bmi, children, sex, smoker, region) {
+        // Standardize numeric features
+        const age_scaled = (age - model.age_mean) / model.age_std;
+        const bmi_scaled = (bmi - model.bmi_mean) / model.bmi_std;
+        
+        // One-hot encode categorical features
+        const sex_female = sex === 'female' ? 1 : 0;
+        const sex_male = sex === 'male' ? 1 : 0;
+        const smoker_no = smoker === 'no' ? 1 : 0;
+        const smoker_yes = smoker === 'yes' ? 1 : 0;
+        const region_northeast = region === 'northeast' ? 1 : 0;
+        const region_northwest = region === 'northwest' ? 1 : 0;
+        const region_southeast = region === 'southeast' ? 1 : 0;
+        const region_southwest = region === 'southwest' ? 1 : 0;
+
+        // Construct feature vector exactly matching Python model
+        const features = [
+            age_scaled, bmi_scaled, children,
+            sex_female, sex_male,
+            smoker_no, smoker_yes,
+            region_northeast, region_northwest, region_southeast, region_southwest
+        ];
+
+        // Dot product with coefficients
+        let prediction_scaled = model.intercept;
+        for (let i = 0; i < features.length; i++) {
+            prediction_scaled += features[i] * model.coefficients[i];
+        }
+
+        // Inverse standard scaling
+        return prediction_scaled * model.charges_std + model.charges_mean;
+    }
+
+    document.getElementById('frm').addEventListener('submit', e => {
         e.preventDefault();
-        const b=document.getElementById('btn');
-        b.classList.add('loading'); b.textContent='Calculating...';
+        
+        const b = document.getElementById('btn');
+        b.classList.add('loading');
+        
+        setTimeout(() => {
+            const age = +document.getElementById('age').value;
+            const sex = document.getElementById('sex').value;
+            const bmi = +document.getElementById('bmi').value;
+            const children = +document.getElementById('children').value;
+            const smoker = document.getElementById('smoker').value;
+            const region = document.getElementById('region').value;
 
-        const fd={
-            age:+document.getElementById('age').value,
-            sex:document.getElementById('sex').value,
-            bmi:+document.getElementById('bmi').value,
-            children:+document.getElementById('children').value,
-            smoker:document.getElementById('smoker').value,
-            region:document.getElementById('region').value
-        };
+            // Run ML model in browser
+            const c = predict(age, bmi, children, sex, smoker, region);
 
-        const r=await fetch('/api/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(fd)});
-        const j=await r.json();
-        const c=j.predicted_cost;
+            document.getElementById('empty').style.display='none';
+            const o = document.getElementById('outcome');
+            o.classList.remove('visible');
+            void o.offsetWidth; // trigger reflow
+            o.classList.add('visible');
 
-        document.getElementById('empty').style.display='none';
-        const o=document.getElementById('outcome');
-        o.classList.remove('visible');
-        void o.offsetWidth;
-        o.classList.add('visible');
+            document.getElementById('val').textContent = '$' + Math.round(c).toLocaleString();
+            document.getElementById('monthly').textContent = '~$' + Math.round(c/12).toLocaleString() + ' / month';
 
-        document.getElementById('val').textContent='$'+Math.round(c).toLocaleString();
-        document.getElementById('monthly').textContent='~$'+Math.round(c/12).toLocaleString()+' / month';
+            const pct = Math.min(c/65000*100, 100);
+            const fl = document.getElementById('fill');
+            fl.style.width = pct + '%';
 
-        const pct=Math.min(c/65000*100,100);
-        const fl=document.getElementById('fill');
-        fl.style.width=pct+'%';
+            let lv, cl;
+            if (c < 8000) { lv='Low'; cl='#34d399'; }
+            else if (c < 20000) { lv='Moderate'; cl='#facc15'; }
+            else if (c < 35000) { lv='High'; cl='#f97316'; }
+            else { lv='Very High'; cl='#ef4444'; }
+            document.getElementById('lvl').textContent = lv;
+            fl.style.background = cl;
 
-        let lv,cl;
-        if(c<8000){lv='Low';cl='#34d399';}
-        else if(c<20000){lv='Moderate';cl='#facc15';}
-        else if(c<35000){lv='High';cl='#f97316';}
-        else{lv='Very High';cl='#ef4444';}
-        document.getElementById('lvl').textContent=lv;
-        fl.style.background=cl;
+            const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+            document.getElementById('o-age').textContent = age;
+            document.getElementById('o-sex').textContent = cap(sex);
+            document.getElementById('o-bmi').textContent = bmi.toFixed(1);
+            document.getElementById('o-smk').textContent = cap(smoker);
+            document.getElementById('o-kid').textContent = children;
+            document.getElementById('o-reg').textContent = cap(region);
 
-        const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
-        document.getElementById('o-age').textContent=fd.age;
-        document.getElementById('o-sex').textContent=cap(fd.sex);
-        document.getElementById('o-bmi').textContent=fd.bmi.toFixed(1);
-        document.getElementById('o-smk').textContent=cap(fd.smoker);
-        document.getElementById('o-kid').textContent=fd.children;
-        document.getElementById('o-reg').textContent=cap(fd.region);
-
-        b.classList.remove('loading'); b.textContent='Estimate Cost';
+            b.classList.remove('loading');
+        }, 300); // Artificial delay for smooth UI feedback
     });
     </script>
 </body>
-</html>'''
-
-
-# ─── HTTP Server ──────────────────────────────────────────────────
-
-class Handler(SimpleHTTPRequestHandler):
-    def do_GET(self):
-        if self.path in ('/', '/index.html'):
-            self.send_response(200)
-            self.send_header('Content-type', 'text/html')
-            self.end_headers()
-            self.wfile.write(HTML_PAGE.encode())
-        elif self.path == '/api/stats':
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps(dataset_stats).encode())
-        else:
-            self.send_error(404)
-
-    def do_POST(self):
-        if self.path == '/api/predict':
-            length = int(self.headers['Content-Length'])
-            data = json.loads(self.rfile.read(length))
-            cost = predict(data['age'], data['sex'], data['bmi'],
-                           data['children'], data['smoker'], data['region'])
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({'predicted_cost': float(cost)}).encode())
-        else:
-            self.send_error(404)
-
-    def log_message(self, *a): pass
-
-
-if __name__ == '__main__':
-    PORT = int(os.environ.get("PORT", 7860))
-    srv = HTTPServer(('0.0.0.0', PORT), Handler)
-    print(f"\n{'='*50}")
-    print(f"  Medical Insurance Cost Estimator")
-    print(f"  http://localhost:{PORT}")
-    print(f"{'='*50}\n")
-    srv.serve_forever()
+</html>
