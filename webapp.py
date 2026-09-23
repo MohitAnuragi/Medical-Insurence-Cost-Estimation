@@ -703,8 +703,8 @@ class Handler(SimpleHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-    PORT = 5000
-    srv = HTTPServer(('localhost', PORT), Handler)
+    PORT = int(os.environ.get("PORT", 5000))
+    srv = HTTPServer(('0.0.0.0', PORT), Handler)
     print(f"\n{'='*50}")
     print(f"  Medical Insurance Cost Estimator")
     print(f"  http://localhost:{PORT}")
