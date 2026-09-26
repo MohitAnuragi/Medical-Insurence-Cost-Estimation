@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insurance Cost Estimator</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
+        <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Outfit', sans-serif;
             min-height: 100vh;
-            background: #0f0f12;
-            color: #eaeaf0;
+            background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+            color: #1e293b;
             overflow-x: hidden;
         }
 
@@ -29,27 +29,27 @@
             position: absolute;
             border-radius: 50%;
             filter: blur(120px);
-            opacity: 0.45;
+            opacity: 0.6;
             will-change: transform;
         }
 
         .blob-1 {
             width: 600px; height: 600px;
-            background: #6c3ce0;
+            background: rgba(139, 92, 246, 0.4);
             top: -10%; left: -8%;
             animation: drift1 18s ease-in-out infinite alternate;
         }
 
         .blob-2 {
             width: 500px; height: 500px;
-            background: #1a8fe0;
+            background: rgba(59, 130, 246, 0.4);
             bottom: -12%; right: -5%;
             animation: drift2 22s ease-in-out infinite alternate;
         }
 
         .blob-3 {
             width: 350px; height: 350px;
-            background: #e04592;
+            background: rgba(236, 72, 153, 0.4);
             top: 55%; left: 50%;
             animation: drift3 15s ease-in-out infinite alternate;
         }
@@ -73,7 +73,7 @@
             inset: 0;
             z-index: 1;
             pointer-events: none;
-            opacity: 0.035;
+            opacity: 0.04;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
             background-size: 180px;
         }
@@ -101,14 +101,14 @@
 
         .hero .tag {
             display: inline-block;
-            font-size: 0.72rem;
-            font-weight: 600;
+            font-size: 0.75rem;
+            font-weight: 700;
             letter-spacing: 0.14em;
             text-transform: uppercase;
-            color: #a78bfa;
-            background: rgba(167, 139, 250, 0.08);
-            border: 1px solid rgba(167, 139, 250, 0.15);
-            padding: 0.35rem 1rem;
+            color: #6d28d9;
+            background: rgba(109, 40, 217, 0.1);
+            border: 1px solid rgba(109, 40, 217, 0.2);
+            padding: 0.4rem 1.2rem;
             border-radius: 999px;
             margin-bottom: 1.4rem;
         }
@@ -119,18 +119,20 @@
             line-height: 1.15;
             letter-spacing: -0.02em;
             margin-bottom: 0.9rem;
+            color: #0f172a;
         }
 
         .hero h1 .grad {
-            background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 50%, #34d399 100%);
+            background: linear-gradient(135deg, #6d28d9 0%, #2563eb 50%, #059669 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .hero p {
-            color: #8b8ba0;
-            font-size: 1.05rem;
+            color: #475569;
+            font-size: 1.1rem;
+            font-weight: 500;
             max-width: 520px;
             margin: 0 auto;
             line-height: 1.65;
@@ -140,47 +142,52 @@
         .pills {
             display: flex;
             justify-content: center;
-            gap: 0.6rem;
+            gap: 0.8rem;
             flex-wrap: wrap;
             margin-bottom: 2.4rem;
             animation: riseIn 0.7s 0.15s both;
         }
 
         .pill {
-            background: rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.06);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
             border-radius: 999px;
-            padding: 0.5rem 1.2rem;
-            font-size: 0.82rem;
-            color: #b0b0c8;
-            transition: border-color 0.3s, color 0.3s;
+            padding: 0.6rem 1.4rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #64748b;
+            transition: border-color 0.3s, color 0.3s, transform 0.3s;
         }
 
         .pill:hover {
-            border-color: rgba(167,139,250,0.3);
-            color: #d0d0e8;
+            border-color: rgba(109, 40, 217, 0.3);
+            color: #334155;
+            transform: translateY(-2px);
         }
 
         .pill strong {
-            color: #eaeaf0;
-            font-weight: 600;
-            margin-right: 0.25rem;
+            color: #0f172a;
+            font-weight: 800;
+            margin-right: 0.3rem;
         }
 
         /* ── Glass card base ── */
         .glass {
-            background: rgba(255,255,255,0.03);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 40px rgba(31, 38, 135, 0.08);
             border-radius: 20px;
-            transition: border-color 0.4s;
+            transition: border-color 0.4s, box-shadow 0.4s;
         }
 
         .glass:hover {
-            border-color: rgba(255,255,255,0.1);
+            border-color: rgba(255, 255, 255, 1);
+            box-shadow: 0 15px 50px rgba(31, 38, 135, 0.12);
         }
 
         /* ── Two-column layout ── */
@@ -197,79 +204,80 @@
         }
 
         .form-panel h2 {
-            font-size: 1.15rem;
-            font-weight: 700;
+            font-size: 1.3rem;
+            font-weight: 800;
             margin-bottom: 1.6rem;
-            color: #d4d4e8;
+            color: #0f172a;
         }
 
         .field {
-            margin-bottom: 1.1rem;
+            margin-bottom: 1.2rem;
         }
 
         .field label {
             display: block;
-            font-size: 0.78rem;
-            font-weight: 500;
-            color: #7a7a96;
-            margin-bottom: 0.35rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 0.4rem;
             letter-spacing: 0.03em;
         }
 
         .field input,
         .field select {
             width: 100%;
-            padding: 0.7rem 0.9rem;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
+            padding: 0.75rem 1rem;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
             border-radius: 10px;
-            color: #eaeaf0;
+            color: #0f172a;
             font-family: 'Outfit', sans-serif;
-            font-size: 0.92rem;
+            font-size: 1rem;
+            font-weight: 600;
             outline: none;
             transition: border-color 0.3s, box-shadow 0.3s;
         }
 
-        .field input::placeholder { color: #4a4a64; }
+        .field input::placeholder { color: #94a3b8; font-weight: 500; }
 
         .field input:focus,
         .field select:focus {
-            border-color: rgba(167,139,250,0.5);
-            box-shadow: 0 0 0 3px rgba(167,139,250,0.1);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
         }
 
         .field select option {
-            background: #1a1a24;
-            color: #eaeaf0;
+            background: #ffffff;
+            color: #0f172a;
         }
 
         .row-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 0.9rem;
+            gap: 1rem;
         }
 
         .btn {
             width: 100%;
-            padding: 0.85rem 1rem;
+            padding: 0.9rem 1rem;
             border: none;
             border-radius: 12px;
             font-family: 'Outfit', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
+            font-size: 1.05rem;
+            font-weight: 700;
             color: #fff;
             cursor: pointer;
-            margin-top: 0.6rem;
+            margin-top: 0.8rem;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, #7c3aed, #3b82f6);
-            box-shadow: 0 4px 24px rgba(124,58,237,0.25);
+            background: linear-gradient(135deg, #7c3aed, #2563eb);
+            box-shadow: 0 6px 24px rgba(124, 58, 237, 0.3);
             transition: transform 0.25s, box-shadow 0.25s;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(124,58,237,0.35);
+            box-shadow: 0 10px 32px rgba(124, 58, 237, 0.4);
         }
 
         .btn:active { transform: translateY(0); }
@@ -278,7 +286,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.12) 50%, transparent 60%);
+            background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.2) 50%, transparent 60%);
             background-size: 250% 100%;
             animation: shimmer 3s ease-in-out infinite;
         }
@@ -298,10 +306,10 @@
         }
 
         .result-panel h2 {
-            font-size: 1.15rem;
-            font-weight: 700;
+            font-size: 1.3rem;
+            font-weight: 800;
             margin-bottom: 1.6rem;
-            color: #d4d4e8;
+            color: #0f172a;
         }
 
         .empty-state {
@@ -310,8 +318,9 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            color: #4a4a64;
-            font-size: 0.92rem;
+            color: #64748b;
+            font-size: 1rem;
+            font-weight: 600;
             line-height: 1.6;
             padding: 2rem 1rem;
         }
@@ -340,58 +349,63 @@
             margin-bottom: 1.2rem;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(160deg, rgba(124,58,237,0.12) 0%, rgba(52,211,153,0.08) 100%);
-            border: 1px solid rgba(167,139,250,0.12);
+            background: linear-gradient(160deg, rgba(124, 58, 237, 0.08) 0%, rgba(5, 150, 105, 0.08) 100%);
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.5);
         }
 
         .amount-box .sup {
-            font-size: 0.72rem;
-            font-weight: 600;
+            font-size: 0.8rem;
+            font-weight: 800;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: #34d399;
-            margin-bottom: 0.45rem;
+            color: #059669;
+            margin-bottom: 0.5rem;
         }
 
         .amount-box .val {
-            font-size: clamp(2.2rem, 4vw, 3.2rem);
+            font-size: clamp(2.2rem, 4vw, 3.4rem);
             font-weight: 800;
             letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #a78bfa, #34d399);
+            background: linear-gradient(135deg, #6d28d9, #059669);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .amount-box .sub {
-            font-size: 0.85rem;
-            color: #7a7a96;
-            margin-top: 0.3rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #475569;
+            margin-top: 0.4rem;
         }
 
         /* cost bar */
         .cost-bar {
-            padding: 0.9rem 1rem;
-            background: rgba(255,255,255,0.03);
-            border-radius: 10px;
+            padding: 1rem 1.2rem;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 12px;
             margin-bottom: 1.2rem;
         }
 
         .cost-bar .bar-head {
             display: flex;
             justify-content: space-between;
-            font-size: 0.75rem;
-            color: #7a7a96;
-            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 0.5rem;
         }
 
-        .cost-bar .bar-head .level { font-weight: 600; color: #b0b0c8; }
+        .cost-bar .bar-head .level { font-weight: 800; color: #0f172a; }
 
         .track {
-            height: 6px;
-            background: rgba(255,255,255,0.06);
+            height: 8px;
+            background: rgba(0, 0, 0, 0.06);
             border-radius: 999px;
             overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .fill {
@@ -405,25 +419,28 @@
         .chips {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 0.6rem;
+            gap: 0.8rem;
             margin-top: auto;
         }
 
         .chip {
-            background: rgba(255,255,255,0.03);
-            border-radius: 10px;
-            padding: 0.65rem 0.8rem;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0,0,0,0.04);
+            border-radius: 12px;
+            padding: 0.75rem 0.9rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
 
-        .chip .ck { font-size: 0.65rem; color: #5a5a76; text-transform: uppercase; letter-spacing: 0.06em; }
-        .chip .cv { font-size: 0.88rem; font-weight: 600; margin-top: 0.15rem; }
+        .chip .ck { font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; }
+        .chip .cv { font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-top: 0.2rem; }
 
         /* ── Footer ── */
         .foot {
             text-align: center;
             padding: 2.4rem 1rem 1.2rem;
-            font-size: 0.75rem;
-            color: #3e3e56;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
             letter-spacing: 0.02em;
             animation: riseIn 0.7s 0.45s both;
         }
